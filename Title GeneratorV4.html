@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sequence Generator - Themed</title>
+    <style id="theme-style">
+        :root {
+            --bg-color: #f0f2f5;
+            --box-bg: #ffffff;
+            --machine-bg: #1e1e1e;
+            --accent: #007aff;
+            --text-main: #777;
+            --text-active: #fff;
+            --item-height: 50px;
+            --lens-bg: rgba(255, 255, 255, 0.07);
+        }
+
+        /* --- THEME VARIATIONS --- */
+        body.theme-cyberpunk {
+            --bg-color: #0d0221;
+            --box-bg: #0d0221;
+            --machine-bg: #000;
+            --accent: #ff00ff;
+            --text-main: #00ffcc;
+            --text-active: #ff00ff;
+            --lens-bg: rgba(255, 0, 255, 0.1);
+        }
+        body.theme-mac {
+            --bg-color: #e0e0e0;
+            --box-bg: #ffffff;
+            --machine-bg: #f5f5f7;
+            --accent: #0071e3;
+            --text-main: #86868b;
+            --text-active: #1d1d1f;
+            --lens-bg: rgba(0, 0, 0, 0.05);
+        }
+        body.theme-terminal {
+            --bg-color: #000;
+            --box-bg: #000;
+            --machine-bg: #050505;
+            --accent: #00ff00;
+            --text-main: #004400;
+            --text-active: #00ff00;
+            --lens-bg: rgba(0, 255, 0, 0.05);
+        }
+        body.theme-berry {
+            --bg-color: #fce4ec;
+            --box-bg: #ffffff;
+            --machine-bg: #f8f9fa;
+            --accent: #9c27b0;
+            --text-main: #9e9e9e;
+            --text-active: #9c27b0;
+            --lens-bg: rgba(156, 39, 176, 0.1);
+        }
+
+        /* --- BASE STYLES --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: var(--bg-color);
+            user-select: none;
+            transition: background 0.3s ease;
+        }
+
+        .theme-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+
+        select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .generator-box {
+            background: var(--box-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            width: 98%;
+            max-width: 1400px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .picker-wrapper {
+            display: flex;
+            position: relative;
+            height: calc(var(--item-height) * 3);
+            background: var(--machine-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            border: 3px solid #333;
+        }
+
+        .picker-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: var(--item-height);
+            background: var(--lens-bg);
+            transform: translateY(-50%);
+            pointer-events: none;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            z-index: 10;
+        }
+
+        .tumbler {
+            flex: 1;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+            cursor: ns-resize;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .tumbler:nth-child(1) { flex: 0.7; } 
+        .tumbler:nth-child(2) { flex: 0.6; } 
+        .tumbler:nth-child(4) { flex: 1.5; } 
+        .tumbler:nth-child(7) { flex: 2.8; } 
+
+        .item-list { position: absolute; width: 100%; top: 0; left: 0; padding-top: var(--item-height); }
+
+        .item {
+            height: var(--item-height);
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'Consolas', monospace; 
+            color: var(--text-main);
+            transition: color 0.2s;
+            white-space: pre; 
+        }
+
+        .item.active-preview { color: var(--text-active); }
+
+        button#copyBtn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 18px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            transition: opacity 0.2s;
+        }
+
+        button#copyBtn:hover { opacity: 0.85; }
+
+        #copy-status {
+            margin-top: 15px;
+            height: 24px;
+            font-weight: bold;
+            color: var(--accent);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="theme-selector">
+    <select id="styleSwitcher">
+        <option value="theme-midnight">Midnight Pro</option>
+        <option value="theme-cyberpunk">Cyberpunk Neon</option>
+        <option value="theme-mac">Classic Mac</option>
+        <option value="theme-terminal">Retro Terminal</option>
+        <option value="theme-berry">Soft Berry</option>
+    </select>
+</div>
+
+<div class="generator-box">
+    <div class="picker-wrapper" id="mainContainer"></div>
+    <button id="copyBtn">COPY SEQUENCE</button>
+    <div id="copy-status"></div>
+</div>
+
+<script>
+    // --- DATA & CONFIG ---
+    const sequenceData = [
+        ['VAS,'], 
+        ['AT,', 'DE,', 'CH,'], 
+        ['Tel,', 'Mail,', 'Queue,'], 
+        ['12H CTR,', '16H CTF,', '2BD,', '2BD CTR,', '2BD FIX,', '2H,', '4H,', '4H CTF,', '4H CTR,', '4H OnSite,', '6H CTR,', '8H CTR,', '8H FIX,', 'NBD,', 'NBD FIX,', 'NBD Exchange,', 'NBD CTR,', 'NDA,', 'SBD,', 'SBD FIX,'], 
+        ['SW,', 'BF-TPM,', 'PM,', 'PM-CSR,', 'PM-HYD,', 'PM-BF,', 'BF,'], 
+        ['DMPS,', 'PMPS,', 'SMPS,'], 
+        [' //', ' //Trust Case_CBA', ' //Trust Case_Contract Extension', ' //Trust Case_Onboarding']
+    ];
+
+    const defaults = ["VAS,", "DE,", "Mail,", "NBD,", "BF-TPM,", "DMPS,", " //"];
+    const itemHeight = 50; 
+    const container = document.getElementById('mainContainer');
+    const switcher = document.getElementById('styleSwitcher');
+
+    // --- THEME PERSISTENCE ---
+    const savedTheme = localStorage.getItem('user-theme') || 'theme-midnight';
+    document.body.className = savedTheme;
+    switcher.value = savedTheme;
+
+    switcher.addEventListener('change', (e) => {
+        const theme = e.target.value;
+        document.body.className = theme;
+        localStorage.setItem('user-theme', theme);
+    });
+
+    // --- GENERATOR LOGIC ---
+    sequenceData.forEach((data, colIndex) => {
+        const tumbler = document.createElement('div');
+        tumbler.className = 'tumbler';
+        const itemList = document.createElement('div');
+        itemList.className = 'item-list';
+        
+        const defaultIndex = data.indexOf(defaults[colIndex]);
+        const initialTop = defaultIndex !== -1 ? -(defaultIndex * itemHeight) : 0;
+        itemList.style.top = initialTop + 'px';
+
+        data.forEach(text => {
+            const item = document.createElement('div');
+            item.className = 'item';
+            item.textContent = text;
+            itemList.appendChild(item);
+        });
+
+        tumbler.appendChild(itemList);
+        container.appendChild(tumbler);
+
+        let isDragging = false;
+        let startY = 0;
+        let currentTop = 0;
+
+        const updateActive = () => {
+            const top = parseInt(itemList.style.top);
+            const index = Math.abs(Math.round(top / itemHeight));
+            itemList.querySelectorAll('.item').forEach((it, idx) => it.classList.toggle('active-preview', idx === index));
+        };
+
+        tumbler.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startY = e.clientY;
+            currentTop = parseInt(itemList.style.top);
+            itemList.style.transition = 'none';
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            itemList.style.top = (currentTop + (e.clientY - startY)) + 'px';
+            updateActive();
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            let finalTop = parseInt(itemList.style.top);
+            const minTop = -((data.length - 1) * itemHeight);
+            finalTop = Math.max(minTop, Math.min(0, finalTop));
+            itemList.style.top = (Math.round(finalTop / itemHeight) * itemHeight) + 'px';
+            itemList.style.transition = 'top 0.1s ease-out';
+            setTimeout(updateActive, 20);
+        });
+
+        tumbler.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            let newTop = parseInt(itemList.style.top) + (e.deltaY > 0 ? -itemHeight : itemHeight);
+            if (newTop <= 0 && newTop >= -((data.length - 1) * itemHeight)) {
+                itemList.style.top = newTop + 'px';
+                updateActive();
+            }
+        }, { passive: false });
+        
+        updateActive();
+    });
+
+    // --- COPY FUNCTION ---
+    document.getElementById('copyBtn').addEventListener('click', () => {
+        let result = "";
+        document.querySelectorAll('.item-list').forEach((list, i) => {
+            const top = parseInt(list.style.top);
+            const index = Math.abs(Math.round(top / itemHeight));
+            result += sequenceData[i][index];
+        });
+        navigator.clipboard.writeText(result).then(() => {
+            document.getElementById('copy-status').textContent = "COPIED: " + result;
+            setTimeout(() => { document.getElementById('copy-status').textContent = ""; }, 3000);
+        });
+    });
+</script>
+</body>
+</html>
