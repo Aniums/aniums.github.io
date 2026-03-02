@@ -5,7 +5,7 @@
     <title>Sequence Generator - Themed</title>
     <style id="theme-style">
         :root {
-            /* --- MIDNIGHT PRO PLUS MAX (NEW DEFAULT) --- */
+            /* --- MIDNIGHT PRO PLUS MAX (DEFAULT) --- */
             --bg-color: #121212;
             --box-bg: #1e1e1e;
             --machine-bg: #ffffff;
@@ -207,7 +207,7 @@
 
 <div class="footer-info">
     <div class="update-checker" id="updateStatus">
-        <div id="update-msg">Checking for updates...</div>
+        <div id="update-msg">Auto-checking updates...</div>
         <div class="update-actions" id="updateActions">
             <button class="action-btn" onclick="copyUpdate()">Copy Link</button>
             <button class="action-btn" onclick="openUpdate()">Open New Tab</button>
@@ -300,15 +300,25 @@
         updateActive();
     });
 
+    // --- CHECK FOR NEXT 3 VERSIONS ---
     async function checkUpdates() {
         const msg = document.getElementById('update-msg');
         let found = false;
-        for (let i = CURRENT_VERSION + 1; i <= CURRENT_VERSION + 30; i++) {
+
+        // Scans only the next 3 versions
+        for (let i = CURRENT_VERSION + 1; i <= CURRENT_VERSION + 3; i++) {
+            const testUrl = `${BASE_URL}${i}.html`;
             try {
-                const res = await fetch(`${BASE_URL}${i}.html`, { method: 'HEAD' });
-                if (res.ok) { LATEST_FOUND = `${BASE_URL}${i}.html`; found = true; }
-            } catch (e) {}
+                const response = await fetch(testUrl, { method: 'HEAD', cache: 'no-cache' });
+                if (response.ok) {
+                    LATEST_FOUND = testUrl;
+                    found = true;
+                }
+            } catch (e) {
+                // Do nothing if file is not found
+            }
         }
+
         if (found) {
             msg.textContent = "There is a newer version for this generator";
             document.getElementById('updateActions').style.display = "flex";
@@ -316,7 +326,10 @@
             msg.textContent = "You have the latest link to the generator.";
         }
     }
-    checkUpdates();
+
+    window.onload = () => {
+        setTimeout(checkUpdates, 500);
+    };
 
     function copyUpdate() { navigator.clipboard.writeText(LATEST_FOUND); alert("Copied!"); }
     function openUpdate() { window.open(LATEST_FOUND, '_blank'); }
