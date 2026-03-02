@@ -5,17 +5,27 @@
     <title>Sequence Generator - Themed</title>
     <style id="theme-style">
         :root {
+            /* --- MIDNIGHT PRO PLUS MAX (NEW DEFAULT) --- */
+            --bg-color: #121212;
+            --box-bg: #1e1e1e;
+            --machine-bg: #ffffff;
+            --accent: #007aff;
+            --text-main: #888;
+            --text-active: #000;
+            --item-height: 50px;
+            --lens-bg: rgba(0, 122, 255, 0.1);
+        }
+
+        /* --- THEME VARIATIONS --- */
+        body.theme-old-midnight {
             --bg-color: #f0f2f5;
             --box-bg: #ffffff;
             --machine-bg: #1e1e1e;
             --accent: #007aff;
             --text-main: #777;
             --text-active: #fff;
-            --item-height: 50px;
             --lens-bg: rgba(255, 255, 255, 0.07);
         }
-
-        /* --- THEME VARIATIONS --- */
         body.theme-cyberpunk {
             --bg-color: #0d0221;
             --box-bg: #0d0221;
@@ -53,7 +63,6 @@
             --lens-bg: rgba(156, 39, 176, 0.1);
         }
 
-        /* --- BASE STYLES --- */
         body {
             font-family: 'Segoe UI', Tahoma, sans-serif;
             display: flex;
@@ -67,29 +76,17 @@
             transition: background 0.3s ease;
         }
 
-        .theme-selector {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 100;
-        }
-
-        select {
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            font-weight: bold;
-            cursor: pointer;
-        }
+        .theme-selector { position: fixed; top: 20px; right: 20px; z-index: 100; }
+        select { padding: 8px 12px; border-radius: 6px; border: 1px solid #444; background: #fff; font-weight: bold; cursor: pointer; }
 
         .generator-box {
             background: var(--box-bg);
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
             width: 98%;
             max-width: 1400px;
-            border: 1px solid rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
         .picker-wrapper {
@@ -106,15 +103,13 @@
         .picker-wrapper::before {
             content: '';
             position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
+            top: 50%; left: 0; right: 0;
             height: var(--item-height);
             background: var(--lens-bg);
             transform: translateY(-50%);
             pointer-events: none;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
             z-index: 10;
         }
 
@@ -124,7 +119,7 @@
             overflow: hidden;
             position: relative;
             cursor: ns-resize;
-            border-right: 1px solid rgba(255,255,255,0.1);
+            border-right: 1px solid rgba(0,0,0,0.05);
         }
 
         .tumbler:nth-child(1) { flex: 0.7; } 
@@ -133,7 +128,6 @@
         .tumbler:nth-child(7) { flex: 2.8; } 
 
         .item-list { position: absolute; width: 100%; top: 0; left: 0; padding-top: var(--item-height); }
-
         .item {
             height: var(--item-height);
             display: flex;
@@ -146,7 +140,6 @@
             transition: color 0.2s;
             white-space: pre; 
         }
-
         .item.active-preview { color: var(--text-active); }
 
         button#copyBtn {
@@ -159,25 +152,46 @@
             border-radius: 6px;
             cursor: pointer;
             width: 100%;
-            transition: opacity 0.2s;
         }
 
-        button#copyBtn:hover { opacity: 0.85; }
+        #copy-status { margin-top: 15px; height: 24px; font-weight: bold; color: var(--accent); text-align: center; }
 
-        #copy-status {
-            margin-top: 15px;
-            height: 24px;
-            font-weight: bold;
-            color: var(--accent);
-            text-align: center;
+        .footer-info {
+            position: fixed;
+            bottom: 20px;
+            width: 95%;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            pointer-events: none;
+        }
+
+        .update-checker, .changelog-box {
+            background: #1e1e1e;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--accent);
+            color: #888;
+            font-size: 11px;
+            pointer-events: auto;
+            max-width: 300px;
+        }
+
+        .changelog-box { text-align: right; }
+        .changelog-box b { color: var(--accent); display: block; margin-bottom: 5px; }
+        .update-actions { margin-top: 8px; display: none; gap: 5px; }
+        .action-btn {
+            padding: 4px 8px; font-size: 10px; cursor: pointer;
+            border: 1px solid var(--accent); background: transparent; color: var(--accent); border-radius: 3px;
         }
     </style>
 </head>
-<body>
+<body class="theme-midnight-plus-max">
 
 <div class="theme-selector">
     <select id="styleSwitcher">
-        <option value="theme-midnight">Midnight Pro</option>
+        <option value="theme-midnight-plus-max">Midnight Pro Plus MAX</option>
+        <option value="theme-old-midnight">Old, not so Midnight Pro</option>
         <option value="theme-cyberpunk">Cyberpunk Neon</option>
         <option value="theme-mac">Classic Mac</option>
         <option value="theme-terminal">Retro Terminal</option>
@@ -191,14 +205,35 @@
     <div id="copy-status"></div>
 </div>
 
+<div class="footer-info">
+    <div class="update-checker" id="updateStatus">
+        <div id="update-msg">Checking for updates...</div>
+        <div class="update-actions" id="updateActions">
+            <button class="action-btn" onclick="copyUpdate()">Copy Link</button>
+            <button class="action-btn" onclick="openUpdate()">Open New Tab</button>
+        </div>
+    </div>
+
+    <div class="changelog-box">
+        <b>Changelog:</b>
+        • Added Midnight Pro Plus MAX (Inverted) (Mar 2, 2026)<br>
+        • Renamed Old Midnight Pro (Mar 2, 2026)<br>
+        • Added "Supply," to slot 5 (Mar 2, 2026)<br>
+        • Auto-update checker implemented (Mar 2, 2026)
+    </div>
+</div>
+
 <script>
-    // --- DATA & CONFIG ---
+    const CURRENT_VERSION = 4;
+    const BASE_URL = "https://aniums.github.io/Title%20GeneratorV";
+    let LATEST_FOUND = "";
+
     const sequenceData = [
         ['VAS,'], 
         ['AT,', 'DE,', 'CH,'], 
         ['Tel,', 'Mail,', 'Queue,'], 
         ['12H CTR,', '16H CTF,', '2BD,', '2BD CTR,', '2BD FIX,', '2H,', '4H,', '4H CTF,', '4H CTR,', '4H OnSite,', '6H CTR,', '8H CTR,', '8H FIX,', 'NBD,', 'NBD FIX,', 'NBD Exchange,', 'NBD CTR,', 'NDA,', 'SBD,', 'SBD FIX,'], 
-        ['SW,', 'BF-TPM,', 'PM,', 'PM-CSR,', 'PM-HYD,', 'PM-BF,', 'BF,'], 
+        ['Supply,', 'SW,', 'BF-TPM,', 'PM,', 'PM-CSR,', 'PM-HYD,', 'PM-BF,', 'BF,'], 
         ['DMPS,', 'PMPS,', 'SMPS,'], 
         [' //', ' //Trust Case_CBA', ' //Trust Case_Contract Extension', ' //Trust Case_Onboarding']
     ];
@@ -206,29 +241,14 @@
     const defaults = ["VAS,", "DE,", "Mail,", "NBD,", "BF-TPM,", "DMPS,", " //"];
     const itemHeight = 50; 
     const container = document.getElementById('mainContainer');
-    const switcher = document.getElementById('styleSwitcher');
 
-    // --- THEME PERSISTENCE ---
-    const savedTheme = localStorage.getItem('user-theme') || 'theme-midnight';
-    document.body.className = savedTheme;
-    switcher.value = savedTheme;
-
-    switcher.addEventListener('change', (e) => {
-        const theme = e.target.value;
-        document.body.className = theme;
-        localStorage.setItem('user-theme', theme);
-    });
-
-    // --- GENERATOR LOGIC ---
     sequenceData.forEach((data, colIndex) => {
         const tumbler = document.createElement('div');
         tumbler.className = 'tumbler';
         const itemList = document.createElement('div');
         itemList.className = 'item-list';
-        
         const defaultIndex = data.indexOf(defaults[colIndex]);
-        const initialTop = defaultIndex !== -1 ? -(defaultIndex * itemHeight) : 0;
-        itemList.style.top = initialTop + 'px';
+        itemList.style.top = defaultIndex !== -1 ? -(defaultIndex * itemHeight) + 'px' : '0px';
 
         data.forEach(text => {
             const item = document.createElement('div');
@@ -240,9 +260,7 @@
         tumbler.appendChild(itemList);
         container.appendChild(tumbler);
 
-        let isDragging = false;
-        let startY = 0;
-        let currentTop = 0;
+        let isDragging = false, startY = 0, currentTop = 0;
 
         const updateActive = () => {
             const top = parseInt(itemList.style.top);
@@ -250,55 +268,79 @@
             itemList.querySelectorAll('.item').forEach((it, idx) => it.classList.toggle('active-preview', idx === index));
         };
 
-        tumbler.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            startY = e.clientY;
+        tumbler.onmousedown = (e) => {
+            isDragging = true; startY = e.clientY;
             currentTop = parseInt(itemList.style.top);
             itemList.style.transition = 'none';
-        });
+        };
 
-        window.addEventListener('mousemove', (e) => {
+        window.onmousemove = (e) => {
             if (!isDragging) return;
             itemList.style.top = (currentTop + (e.clientY - startY)) + 'px';
             updateActive();
-        });
+        };
 
-        window.addEventListener('mouseup', () => {
+        window.onmouseup = () => {
             if (!isDragging) return;
             isDragging = false;
-            let finalTop = parseInt(itemList.style.top);
-            const minTop = -((data.length - 1) * itemHeight);
-            finalTop = Math.max(minTop, Math.min(0, finalTop));
+            let finalTop = Math.max(-((data.length - 1) * itemHeight), Math.min(0, parseInt(itemList.style.top)));
             itemList.style.top = (Math.round(finalTop / itemHeight) * itemHeight) + 'px';
             itemList.style.transition = 'top 0.1s ease-out';
             setTimeout(updateActive, 20);
-        });
+        };
 
-        tumbler.addEventListener('wheel', (e) => {
+        tumbler.onwheel = (e) => {
             e.preventDefault();
             let newTop = parseInt(itemList.style.top) + (e.deltaY > 0 ? -itemHeight : itemHeight);
             if (newTop <= 0 && newTop >= -((data.length - 1) * itemHeight)) {
                 itemList.style.top = newTop + 'px';
                 updateActive();
             }
-        }, { passive: false });
-        
+        };
         updateActive();
     });
 
-    // --- COPY FUNCTION ---
-    document.getElementById('copyBtn').addEventListener('click', () => {
-        let result = "";
+    async function checkUpdates() {
+        const msg = document.getElementById('update-msg');
+        let found = false;
+        for (let i = CURRENT_VERSION + 1; i <= CURRENT_VERSION + 30; i++) {
+            try {
+                const res = await fetch(`${BASE_URL}${i}.html`, { method: 'HEAD' });
+                if (res.ok) { LATEST_FOUND = `${BASE_URL}${i}.html`; found = true; }
+            } catch (e) {}
+        }
+        if (found) {
+            msg.textContent = "There is a newer version for this generator";
+            document.getElementById('updateActions').style.display = "flex";
+        } else {
+            msg.textContent = "You have the latest link to the generator.";
+        }
+    }
+    checkUpdates();
+
+    function copyUpdate() { navigator.clipboard.writeText(LATEST_FOUND); alert("Copied!"); }
+    function openUpdate() { window.open(LATEST_FOUND, '_blank'); }
+
+    document.getElementById('copyBtn').onclick = () => {
+        let res = "";
         document.querySelectorAll('.item-list').forEach((list, i) => {
-            const top = parseInt(list.style.top);
-            const index = Math.abs(Math.round(top / itemHeight));
-            result += sequenceData[i][index];
+            const idx = Math.abs(Math.round(parseInt(list.style.top) / itemHeight));
+            res += sequenceData[i][idx];
         });
-        navigator.clipboard.writeText(result).then(() => {
-            document.getElementById('copy-status').textContent = "COPIED: " + result;
-            setTimeout(() => { document.getElementById('copy-status').textContent = ""; }, 3000);
+        navigator.clipboard.writeText(res).then(() => {
+            document.getElementById('copy-status').textContent = "COPIED: " + res;
+            setTimeout(() => document.getElementById('copy-status').textContent = "", 3000);
         });
-    });
+    };
+
+    const switcher = document.getElementById('styleSwitcher');
+    const savedTheme = localStorage.getItem('user-theme') || 'theme-midnight-plus-max';
+    document.body.className = savedTheme;
+    switcher.value = savedTheme;
+    switcher.onchange = (e) => {
+        document.body.className = e.target.value;
+        localStorage.setItem('user-theme', e.target.value);
+    };
 </script>
 </body>
 </html>
