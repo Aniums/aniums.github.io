@@ -5,7 +5,6 @@
     <title>Sequence Generator - Themed</title>
     <style id="theme-style">
         :root {
-            /* --- MIDNIGHT PRO PLUS MAX (DEFAULT) --- */
             --bg-color: #121212;
             --box-bg: #1e1e1e;
             --machine-bg: #ffffff;
@@ -166,6 +165,7 @@
             pointer-events: none;
         }
 
+        /* --- UPDATER STYLE --- */
         .update-checker, .changelog-box {
             background: #1e1e1e;
             padding: 12px;
@@ -175,15 +175,21 @@
             font-size: 11px;
             pointer-events: auto;
             max-width: 300px;
+            transition: all 0.3s ease;
         }
+
+        /* Update States */
+        .status-up-to-date { background: #1b5e20 !important; border-color: #4caf50 !important; color: #fff !important; }
+        .status-update-found { background: #b71c1c !important; border-color: #f44336 !important; color: #fff !important; }
 
         .changelog-box { text-align: right; }
         .changelog-box b { color: var(--accent); display: block; margin-bottom: 5px; }
         .update-actions { margin-top: 8px; display: none; gap: 5px; }
         .action-btn {
             padding: 4px 8px; font-size: 10px; cursor: pointer;
-            border: 1px solid var(--accent); background: transparent; color: var(--accent); border-radius: 3px;
+            border: 1px solid #fff; background: transparent; color: #fff; border-radius: 3px;
         }
+        .action-btn:hover { background: rgba(255,255,255,0.2); }
     </style>
 </head>
 <body class="theme-midnight-plus-max">
@@ -216,8 +222,8 @@
 
     <div class="changelog-box">
         <b>Changelog:</b>
+        • Updated updater with Red/Green status colors (Mar 2, 2026)<br>
         • Added Midnight Pro Plus MAX (Inverted) (Mar 2, 2026)<br>
-        • Renamed Old Midnight Pro (Mar 2, 2026)<br>
         • Added "Supply," to slot 5 (Mar 2, 2026)<br>
         • Auto-update checker implemented (Mar 2, 2026)
     </div>
@@ -300,12 +306,12 @@
         updateActive();
     });
 
-    // --- CHECK FOR NEXT 3 VERSIONS ---
+    // --- UPDATED AUTO UPDATE CHECKER ---
     async function checkUpdates() {
+        const box = document.getElementById('updateStatus');
         const msg = document.getElementById('update-msg');
         let found = false;
 
-        // Scans only the next 3 versions
         for (let i = CURRENT_VERSION + 1; i <= CURRENT_VERSION + 3; i++) {
             const testUrl = `${BASE_URL}${i}.html`;
             try {
@@ -314,15 +320,15 @@
                     LATEST_FOUND = testUrl;
                     found = true;
                 }
-            } catch (e) {
-                // Do nothing if file is not found
-            }
+            } catch (e) {}
         }
 
         if (found) {
+            box.classList.add('status-update-found');
             msg.textContent = "There is a newer version for this generator";
             document.getElementById('updateActions').style.display = "flex";
         } else {
+            box.classList.add('status-up-to-date');
             msg.textContent = "You have the latest link to the generator.";
         }
     }
@@ -357,4 +363,3 @@
 </script>
 </body>
 </html>
-
