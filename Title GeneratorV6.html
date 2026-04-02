@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sequence Pro - v60</title>
+    <style id="theme-style">
+        :root {
+            --bg-color: #f0f2f5;
+            --box-bg: #ffffff;
+            --accent: #007aff;
+            --nav-height: 65px;
+            --page-text-main: #222;
+            --page-text-muted: #5f6368;
+            --page-border: rgba(128,128,128,0.2);
+            --machine-bg: #1e1e1e;
+            --slot-text-muted: #555;
+            --slot-text-active: #ffffff;
+            --item-height: 50px;
+            --lens-bg: rgba(0, 122, 255, 0.1);
+            --slot-radius: 8px;
+            /* Updater Specific */
+            --update-red: #b71c1c;
+        }
+
+        body.theme-dark {
+            --bg-color: #121212;
+            --box-bg: #1e1e1e;
+            --page-text-main: #e0e0e0;
+            --page-text-muted: #9aa0a6;
+            --page-border: rgba(255,255,255,0.1);
+            --accent: #007aff;
+        }
+
+        body.rounder-slots { --slot-radius: 25px; }
+
+        body.no-animations *, body.no-animations *::before, body.no-animations *::after {
+            transition: none !important;
+            animation: none !important;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background-color: var(--bg-color); color: var(--page-text-main); user-select: none; transition: background 0.3s; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+
+        .navbar { position: fixed; top: 0; left: 0; right: 0; height: var(--nav-height); background: #dee1e6; display: flex; align-items: flex-end; padding: 0 30px; z-index: 1000; }
+        body.theme-dark .navbar { background: #202124; }
+        .nav-links { display: flex; align-items: flex-end; height: 100%; flex-grow: 1; justify-content: center; }
+        .nav-item { color: var(--page-text-muted); text-decoration: none; font-weight: 700; font-size: 15px; cursor: pointer; padding: 12px 45px; border-radius: 12px 12px 0 0; margin: 0 -5px; position: relative; transition: color 0.2s, background 0.2s; text-align: center; min-width: 140px; }
+        .nav-item.active { background: var(--box-bg); color: var(--accent); z-index: 5; }
+        .nav-item.active::before { content: ''; position: absolute; bottom: 0; width: 20px; height: 20px; left: -20px; box-shadow: 10px 10px 0 0 var(--box-bg); border-bottom-right-radius: 15px; }
+        .nav-item.active::after { content: ''; position: absolute; bottom: 0; width: 20px; height: 20px; right: -20px; box-shadow: -10px 10px 0 0 var(--box-bg); border-bottom-left-radius: 15px; }
+
+        .nav-right { position: absolute; right: 30px; bottom: 15px; }
+        .settings-menu { position: absolute; top: 60px; right: 40px; width: 260px; background: var(--box-bg); border: 1px solid var(--page-border); border-radius: 12px; padding: 15px; display: none; z-index: 1100; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .settings-menu.open { display: block; }
+        .setting-row { display: flex; align-items: center; justify-content: space-between; font-size: 11px; font-weight: bold; text-transform: uppercase; color: var(--page-text-muted); margin-bottom: 12px; }
+        
+        .page-content { margin-top: var(--nav-height); width: 100%; max-width: 1300px; display: none; flex-grow: 1; }
+        .page-content.active { display: block; }
+        .generator-container { background: var(--box-bg); padding: 40px; border-radius: 0 0 16px 16px; border: 1px solid var(--page-border); border-top: none; }
+        
+        .picker-wrapper { display: flex; position: relative; height: calc(var(--item-height) * 3); background: var(--machine-bg); border-radius: var(--slot-radius); overflow: hidden; margin-bottom: 30px; border: 3px solid #333; transition: border-radius 0.3s; }
+        .picker-wrapper::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: var(--item-height); background: var(--lens-bg); transform: translateY(-50%); pointer-events: none; z-index: 10; border-radius: var(--slot-radius); transition: border-radius 0.3s; }
+        
+        .sync-flash { animation: flash-green 0.6s ease-out; }
+        @keyframes flash-green {
+            0% { border-color: #333; }
+            50% { border-color: #27ae60; box-shadow: 0 0 15px rgba(39, 174, 96, 0.3); }
+            100% { border-color: #333; }
+        }
+
+        .tumbler { flex: 1; height: 100%; overflow: hidden; position: relative; cursor: ns-resize; border-right: 1px solid #333; }
+        .tumbler:last-child { border-right: none; }
+        .item-list { position: absolute; width: 100%; top: 0; left: 0; padding-top: var(--item-height); pointer-events: none; }
+        
+        .item { height: var(--item-height); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; font-family: 'Consolas', monospace; color: var(--slot-text-muted); transition: all 0.2s ease; text-align: center; box-sizing: border-box; padding: 2px; background-clip: content-box; border-radius: calc(var(--slot-radius) + 2px); }
+        .item.active-preview { color: var(--slot-text-active); }
+
+        .optional-fields { display: flex; gap: 20px; margin-bottom: 30px; }
+        .opt-input { flex: 1; background: #f9f9f9; border: 1px solid var(--page-border); padding: 15px; border-radius: 8px; font-family: 'Consolas'; color: #222; }
+        body.theme-dark .opt-input { background: #252525; color: #e0e0e0; }
+        
+        button.action-btn { background: var(--accent); color: white; border: none; padding: 22px; font-size: 16px; font-weight: 700; border-radius: 8px; cursor: pointer; width: 100%; margin-bottom: 10px; transition: transform 0.1s; }
+        button.action-btn:active { transform: scale(0.99); }
+        button.replenish-btn { background: var(--accent) !important; padding: 10px; font-size: 11px; width: 180px; margin: 0 auto 10px 0; display: block; opacity: 0.9; text-transform: uppercase; }
+        .template-btn { background: #333 !important; margin-top: 20px; }
+
+        /* SILENT UPDATER UI */
+        .footer-area { width: 100%; max-width: 1300px; padding: 20px; box-sizing: border-box; display: none; } /* Hidden by default */
+        .update-checker { 
+            background: var(--update-red); padding: 15px; border-radius: 8px; 
+            border: 1px solid #f44336; color: #fff; font-size: 12px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 4px 15px rgba(183, 28, 28, 0.4);
+        }
+        .update-actions { display: flex; gap: 10px; }
+        .update-mini-btn { 
+            padding: 6px 14px; font-size: 10px; cursor: pointer; font-weight: bold;
+            border: 1px solid #fff; background: rgba(255,255,255,0.1); color: #fff; border-radius: 4px;
+            text-transform: uppercase; transition: background 0.2s;
+        }
+        .update-mini-btn:hover { background: rgba(255,255,255,0.3); }
+
+        /* Kids Mode Row Colors */
+        body.kids-mode .item.row-orange { background-color: #ff8c00; color: #fff !important; }
+        body.kids-mode .item.row-green  { background-color: #27ae60; color: #fff !important; }
+        body.kids-mode .item.row-purple { background-color: #8e44ad; color: #fff !important; }
+        body.kids-mode .item.row-yellow { background-color: #ffff00; color: #000 !important; }
+        body.kids-mode .item.row-red    { background-color: #e74c3c; color: #fff !important; }
+        body.kids-mode .item.row-cyan   { background-color: #00bcd4; color: #fff !important; }
+    </style>
+</head>
+<body class="theme-default">
+
+<nav class="navbar">
+    <div class="nav-links">
+        <a id="nav-generator" class="nav-item active" onmouseenter="showView('generator', this)">Case Title</a>
+        <a id="nav-elevation" class="nav-item" onmouseenter="showView('elevation', this)">Elevation Generator</a>
+    </div>
+    <div class="nav-right">
+        <div class="settings-trigger" style="cursor:pointer; font-size: 20px;" onclick="toggleSettings()">⚙️</div>
+    </div>
+</nav>
+
+<div class="settings-menu" id="settingsMenu">
+    <div class="setting-row"><span>Theme</span><select id="themeSelect" onchange="changeTheme(this.value)"><option value="theme-default">Light</option><option value="theme-dark">Dark</option></select></div>
+    <div class="setting-row"><span>Colored Slot Pills</span><input type="checkbox" id="kidsToggle" onchange="applySettings()"></div>
+    <div class="setting-row"><span>Rounder Slot Pills</span><input type="checkbox" id="roundToggle" onchange="applySettings()"></div>
+    <div class="setting-row"><span>Slot Animations</span><input type="checkbox" id="animToggle" checked onchange="applySettings()"></div>
+</div>
+
+<div id="generator-view" class="page-content active">
+    <div class="generator-container">
+        <div class="picker-wrapper" id="caseContainer"></div>
+        <div class="optional-fields">
+            <input type="text" id="opt1" class="opt-input" placeholder="Incident Number" onpaste="autoCopyOnPaste('case')">
+            <input type="text" id="opt2" class="opt-input" placeholder="Other" onpaste="autoCopyOnPaste('case')">
+        </div>
+        <button class="action-btn" onclick="copyResult('case')">COPY CASE SEQUENCE</button>
+        <button class="action-btn replenish-btn" onclick="copyReplenishment()">Replenishment</button>
+        <div id="case-status" style="margin-top: 15px; font-weight: bold; color: var(--accent); text-align: center; height: 20px;"></div>
+    </div>
+</div>
+
+<div id="elevation-view" class="page-content">
+    <div class="generator-container" id="elevationBox">
+        <div class="picker-wrapper" id="elevationContainer"></div>
+        <div class="optional-fields"><input type="text" id="elevationAddon" class="opt-input" placeholder="CaseID" onpaste="autoCopyOnPaste('elevation')"></div>
+        <button class="action-btn" onclick="copyResult('elevation')">COPY ELEVATION</button>
+        <button class="action-btn template-btn" onclick="copyTemplateText('elevation-status')">"Please check the attached Elevation Template" - Copy Button</button>
+        <div id="elevation-status" style="margin-top: 15px; font-weight: bold; color: var(--accent); text-align: center; height: 20px;"></div>
+    </div>
+</div>
+
+<div class="footer-area" id="footerUpdate">
+    <div class="update-checker">
+        <span id="update-msg">⚠️ A newer version of this tool is available!</span>
+        <div class="update-actions">
+            <button class="update-mini-btn" onclick="openUpdate()">Open Latest Version</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const CURRENT_VERSION = 60; 
+    const BASE_URL = "https://aniums.github.io/Title%20GeneratorV";
+    let LATEST_FOUND = "";
+
+    const itemHeight = 50;
+    const machines = {
+        case: {
+            containerId: 'caseContainer', statusId: 'case-status', 
+            data: [
+                ['VAS'], ['AT', 'DE', 'CH'], ['Tel', 'Mail', 'Queue'], 
+                ['12H CTR', '16H CTF', '2BD', '2BD CTR', '2BD FIX', '2H', '4H', '4H CTF', '4H CTR', '4H OnSite', '6H CTR', '8H CTR', '8H FIX', 'NBD', 'NBD FIX', 'NBD Exchange', 'NBD CTR', 'NDA', 'SBD', 'SBD FIX'], 
+                ['Supply', 'SW', 'BF-TPM', 'PM', 'PM-CSR', 'PM-HYD', 'PM-BF', 'BF'], ['PMPS', 'DMPS', 'SMPS'], 
+                ['Pure', 'Trust Case_CBA', 'Trust Case_Contract Extension', 'Trust Case_Onboarding']
+            ],
+            defaults: ["VAS", "DE", "Mail", "NBD", "BF-TPM", "DMPS", "Pure"], 
+            lists: [],
+            formatter: (vals) => {
+                let base = vals.slice(0, 6).join(',') + ',';
+                let slot7 = vals[6];
+                const opt1 = document.getElementById('opt1').value.trim();
+                const opt2 = document.getElementById('opt2').value.trim();
+                let res = base + ' //';
+                if (slot7 !== 'Pure') res += ' ' + slot7;
+                if (opt1) res += (slot7 === 'Pure') ? ' ' + opt1 : ' // ' + opt1;
+                if (opt2) res += ' // ' + opt2;
+                return res;
+            }
+        },
+        elevation: {
+            containerId: 'elevationContainer', statusId: 'elevation-status',
+            data: [['AT', 'DE', 'CH'], ['HW', 'SW'], ['HEMM', 'BEG']],
+            defaults: ["DE", "HW", "HEMM"], 
+            lists: [],
+            formatter: (vals) => {
+                let res = vals.join('/');
+                const addon = document.getElementById('elevationAddon').value.trim();
+                if (addon) res += '/' + addon;
+                return res;
+            }
+        }
+    };
+
+    // --- SILENT UPDATER LOGIC ---
+    async function checkUpdates() {
+        const footer = document.getElementById('footerUpdate');
+        let found = false;
+
+        for (let i = CURRENT_VERSION + 1; i <= CURRENT_VERSION + 3; i++) {
+            const testUrl = `${BASE_URL}${i}.html`;
+            try {
+                const response = await fetch(testUrl, { method: 'HEAD', cache: 'no-cache' });
+                if (response.ok) {
+                    LATEST_FOUND = testUrl;
+                    found = true;
+                }
+            } catch (e) {}
+        }
+
+        if (found) {
+            footer.style.display = "block"; // Only reveal footer if update exists
+        }
+    }
+
+    function openUpdate() { if(LATEST_FOUND) window.open(LATEST_FOUND, '_blank'); }
+
+    function autoCopyOnPaste(k) { setTimeout(() => copyResult(k), 0); }
+    function toggleSettings() { document.getElementById('settingsMenu').classList.toggle('open'); }
+    function changeTheme(v) { localStorage.setItem('user-theme', v); applySettings(); }
+
+    function applySettings() {
+        const theme = document.getElementById('themeSelect').value;
+        const kids = document.getElementById('kidsToggle').checked;
+        const round = document.getElementById('roundToggle').checked;
+        const anims = document.getElementById('animToggle').checked;
+        let cls = [theme];
+        if (kids) cls.push('kids-mode');
+        if (round) cls.push('rounder-slots');
+        if (!anims) cls.push('no-animations');
+        document.body.className = cls.join(' ');
+        localStorage.setItem('kids-mode', kids);
+        localStorage.setItem('round-slots', round);
+        localStorage.setItem('slot-anims', anims);
+    }
+
+    function getKidsClass(text, mKey, col, rowIdx) {
+        const m = machines[mKey];
+        const defaultVal = m.defaults[col];
+        const defaultIdx = m.data[col].indexOf(defaultVal);
+        const relativeIdx = rowIdx - defaultIdx;
+        if (relativeIdx === 0) return ''; 
+        const rowColors = { '-2': 'row-yellow', '-1': 'row-cyan', '1': 'row-orange', '2': 'row-green', '3': 'row-purple', '4': 'row-red', '5': 'row-yellow', '6': 'row-cyan' };
+        return rowColors[relativeIdx] || 'row-orange';
+    }
+
+    function checkCoupling(key, col, val) {
+        if (key !== 'elevation' || col !== 0) return;
+        const targetList = machines.elevation.lists[2];
+        const box = document.getElementById('elevationContainer');
+        let targetIdx = (val === 'AT') ? 1 : (val === 'DE') ? 0 : -1;
+        if (targetIdx !== -1) {
+            targetList.style.transition = 'top 0.2s cubic-bezier(0.2, 0.8, 0.2, 1)';
+            targetList.style.top = -(targetIdx * itemHeight) + 'px';
+            updateActiveStyles(targetList);
+            box.classList.remove('sync-flash');
+            void box.offsetWidth; box.classList.add('sync-flash');
+        }
+    }
+
+    function updateActiveStyles(list) {
+        const idx = Math.abs(Math.round(parseInt(list.style.top) / itemHeight));
+        list.querySelectorAll('.item').forEach((it, i) => it.classList.toggle('active-preview', i === idx));
+    }
+
+    function initMachine(key) {
+        const m = machines[key];
+        const container = document.getElementById(m.containerId);
+        m.data.forEach((data, col) => {
+            const tumbler = document.createElement('div'); tumbler.className = 'tumbler';
+            const list = document.createElement('div'); list.className = 'item-list';
+            const defIdx = data.indexOf(m.defaults[col]);
+            list.style.top = -(defIdx * itemHeight) + 'px';
+            m.lists.push(list);
+            
+            data.forEach((text, rowIdx) => {
+                const item = document.createElement('div');
+                item.className = 'item ' + getKidsClass(text, key, col, rowIdx);
+                item.textContent = (key === 'case' && col === 6) ? (text === 'Pure' ? '//' : '// ' + text) : text;
+                list.appendChild(item);
+            });
+            tumbler.appendChild(list); container.appendChild(tumbler);
+            
+            let isD = false, sY = 0, cT = 0;
+            tumbler.onmousedown = (e) => { isD = true; sY = e.clientY; cT = parseInt(list.style.top); list.style.transition = 'none'; };
+            window.addEventListener('mousemove', (e) => { if (!isD) return; list.style.top = (cT + (e.clientY - sY)) + 'px'; updateActiveStyles(list); });
+            window.addEventListener('mouseup', () => { 
+                if (!isD) return; isD = false; 
+                let fI = Math.max(-(data.length - 1), Math.min(0, Math.round(parseInt(list.style.top) / itemHeight))); 
+                list.style.transition = 'top 0.2s cubic-bezier(0.2, 0.8, 0.2, 1)'; 
+                list.style.top = (fI * itemHeight) + 'px'; 
+                updateActiveStyles(list);
+                checkCoupling(key, col, data[Math.abs(fI)]);
+            });
+            tumbler.onwheel = (e) => { 
+                e.preventDefault(); 
+                let currentTop = parseInt(list.style.top) || 0;
+                let nextTop = currentTop + (e.deltaY > 0 ? -itemHeight : itemHeight);
+                if (nextTop <= 0 && nextTop >= -((data.length - 1) * itemHeight)) { 
+                    list.style.transition = 'top 0.2s cubic-bezier(0.2, 0.8, 0.2, 1)'; 
+                    list.style.top = nextTop + 'px'; 
+                    updateActiveStyles(list);
+                    checkCoupling(key, col, data[Math.abs(nextTop / itemHeight)]);
+                } 
+            };
+            updateActiveStyles(list);
+        });
+    }
+
+    function copyResult(key) {
+        const m = machines[key];
+        let vals = m.lists.map((l, i) => m.data[i][Math.abs(Math.round(parseInt(l.style.top) / itemHeight))]);
+        let res = m.formatter(vals);
+        navigator.clipboard.writeText(res).then(() => {
+            const st = document.getElementById(m.statusId); st.textContent = "COPIED: " + res;
+            setTimeout(() => st.textContent = "", 2000);
+        });
+    }
+
+    function copyReplenishment() {
+        const m = machines.case;
+        let vals = m.lists.map((l, i) => m.data[i][Math.abs(Math.round(parseInt(l.style.top) / itemHeight))]);
+        let base = vals.slice(0, 6).join(',') + ',Replenishment //';
+        let res = base + (vals[6] !== 'Pure' ? ' ' + vals[6] : '') + (document.getElementById('opt1').value.trim() ? ' // ' + document.getElementById('opt1').value.trim() : '') + (document.getElementById('opt2').value.trim() ? ' // ' + document.getElementById('opt2').value.trim() : '');
+        navigator.clipboard.writeText(res).then(() => { const st = document.getElementById(m.statusId); st.textContent = "COPIED REPLENISHMENT"; setTimeout(() => st.textContent = "", 2000); });
+    }
+
+    function copyTemplateText(id) { navigator.clipboard.writeText("Please check the attached Elevation Template").then(() => { const st = document.getElementById(id); st.textContent = "COPIED TEMPLATE TEXT"; setTimeout(() => st.textContent = "", 2000); }); }
+
+    function showView(id, el) {
+        document.querySelectorAll('.page-content, .nav-item').forEach(x => x.classList.remove('active'));
+        document.getElementById(id + '-view').classList.add('active'); el.classList.add('active');
+    }
+
+    window.onload = () => {
+        initMachine('case'); initMachine('elevation');
+        const sTheme = localStorage.getItem('user-theme') || 'theme-default';
+        const k = localStorage.getItem('kids-mode') === 'true';
+        const r = localStorage.getItem('round-slots') === 'true';
+        const a = localStorage.getItem('slot-anims') !== 'false';
+        document.getElementById('themeSelect').value = sTheme;
+        document.getElementById('kidsToggle').checked = k;
+        document.getElementById('roundToggle').checked = r;
+        document.getElementById('animToggle').checked = a;
+        applySettings();
+        
+        setTimeout(checkUpdates, 1500); // 1.5s delay to avoid layout shift on load
+    };
+</script>
+</body>
+</html>
