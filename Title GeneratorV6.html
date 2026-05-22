@@ -261,7 +261,7 @@
             formatter: (vals) => {
                 let base = vals.slice(0, 6).join(',') + ',';
                 let slot7 = vals[6], opt1 = document.getElementById('opt1').value.trim(), opt2 = document.getElementById('opt2').value.trim();
-                let res = base + ' //';
+                let res = base + ' // ';
                 if (slot7 !== 'Pure') res += ' ' + slot7;
                 if (opt1) res += (slot7 === 'Pure') ? ' ' + opt1 : ' // ' + opt1;
                 if (opt2) res += ' // ' + opt2;
