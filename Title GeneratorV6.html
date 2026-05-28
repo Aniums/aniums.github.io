@@ -21,6 +21,12 @@
             --update-red: #b71c1c;
             --template-green: #27ae60;
             --delete-red: #e74c3c;
+            
+            /* Quick Copy Colors */
+            --quick-blue-bg: #007aff;
+            --quick-blue-text: #ffffff;
+            --quick-yellow-bg: #f1c40f;
+            --quick-yellow-text: #000000;
         }
 
         body.theme-dark {
@@ -30,6 +36,12 @@
             --page-text-muted: #9aa0a6;
             --page-border: rgba(255,255,255,0.1);
             --accent: #007aff;
+            
+            /* Quick Copy Colors Dark Mode */
+            --quick-blue-bg: #1e40af;
+            --quick-blue-text: #ffffff;
+            --quick-yellow-bg: #ca8a04;
+            --quick-yellow-text: #ffffff;
         }
 
         body.rounder-slots { --slot-radius: 25px; }
@@ -130,6 +142,144 @@
         .footer-area { width: 100%; max-width: 1300px; padding: 20px; box-sizing: border-box; display: none; }
         .update-checker { background: var(--update-red); padding: 15px; border-radius: 8px; color: #fff; font-size: 12px; display: flex; align-items: center; justify-content: space-between; }
         .update-mini-btn { padding: 6px 14px; font-size: 10px; cursor: pointer; font-weight: bold; border: 1px solid #fff; background: rgba(255,255,255,0.1); color: #fff; border-radius: 4px; text-transform: uppercase; }
+
+        /* --- Quick Copy Section --- */
+        .quick-copy-section {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0 5px;
+        }
+        .quick-copy-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            width: max-content;
+        }
+        .quick-trigger-btn {
+            width: 75px;
+            height: 52px;
+            background: #333;
+            color: #fff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 15px;
+            font-family: 'Segoe UI', sans-serif;
+            border: 1px solid var(--page-border);
+            transition: background 0.2s, var(--accent) 0.2s;
+            cursor: default;
+        }
+        body.theme-dark .quick-trigger-btn {
+            background: #252525;
+            color: #e0e0e0;
+        }
+        .quick-copy-row:hover .quick-trigger-btn {
+            background: var(--accent);
+            color: #ffffff;
+        }
+        .quick-copy-menu {
+            display: flex;
+            flex-direction: column;
+            background: var(--box-bg);
+            border: 1px solid var(--page-border);
+            border-radius: 8px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(-10px);
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            min-width: 65px;
+            z-index: 10;
+            position: absolute;
+            left: 90px;
+            top: 0;
+        }
+        .quick-copy-row:hover .quick-copy-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+        .quick-menu-item {
+            position: relative;
+            padding: 10px 15px;
+            font-size: 12px;
+            font-weight: bold;
+            font-family: 'Segoe UI', sans-serif;
+            color: var(--page-text-main);
+            cursor: default;
+            text-align: left;
+            border-bottom: 1px solid var(--page-border);
+            transition: background 0.15s, color 0.15s;
+        }
+        .quick-menu-item:last-child {
+            border-bottom: none;
+        }
+        .quick-menu-item:hover {
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--accent);
+        }
+        .quick-sub-menu {
+            display: flex;
+            flex-direction: column;
+            background: var(--box-bg);
+            border: 1px solid var(--page-border);
+            border-radius: 8px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(-10px);
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            min-width: 260px;
+            z-index: 11;
+            position: absolute;
+            left: 100%;
+            top: 0;
+            margin-left: 5px;
+        }
+        .quick-menu-item:hover .quick-sub-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+        .quick-copy-item {
+            padding: 10px 15px;
+            font-size: 12px;
+            font-family: 'Consolas', monospace;
+            color: var(--page-text-main);
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.15s, color 0.15s, opacity 0.15s;
+            border-bottom: 1px solid var(--page-border);
+        }
+        .quick-copy-item:last-child {
+            border-bottom: none;
+        }
+        .quick-copy-item:hover {
+            background: rgba(0, 122, 255, 0.15);
+        }
+        
+        /* Full Menu Selection Window Colors */
+        .color-blue {
+            background-color: var(--quick-blue-bg) !important;
+            color: var(--quick-blue-text) !important;
+        }
+        .color-blue:hover {
+            opacity: 0.9;
+        }
+        .color-yellow {
+            background-color: var(--quick-yellow-bg) !important;
+            color: var(--quick-yellow-text) !important;
+        }
+        .color-yellow:hover {
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body class="theme-default">
@@ -167,6 +317,54 @@
         </div>
         <button class="action-btn" onclick="copyResult('case')">COPY CASE SEQUENCE</button>
         <div id="case-status" style="margin-top: 15px; font-weight: bold; color: var(--accent); text-align: center; height: 20px;"></div>
+    </div>
+
+    <div class="quick-copy-section">
+        <div class="quick-copy-row">
+            <div class="quick-trigger-btn">IW</div>
+            <div class="quick-copy-menu">
+                <div class="quick-menu-item">DE
+                    <div class="quick-sub-menu">
+                        <div class="quick-copy-item" onclick="quickCopyText('EMEA-DE-HEMMERSBACH-MPS-IW')">EMEA-DE-HEMMERSBACH-MPS-IW</div>
+                    </div>
+                </div>
+                <div class="quick-menu-item">AT
+                    <div class="quick-sub-menu">
+                        <div class="quick-copy-item" onclick="quickCopyText('EMEA-AT-HEMMERSBACH-TPM-IW')">EMEA-AT-HEMMERSBACH-TPM-IW</div>
+                        <div class="quick-copy-item color-yellow" onclick="quickCopyText('ATA-PR-TPM_IWAT')">ATA-PR-TPM_IWAT</div>
+                    </div>
+                </div>
+                <div class="quick-menu-item">CH
+                    <div class="quick-sub-menu">
+                        <div class="quick-copy-item" onclick="quickCopyText('EMEA-CH-HEMMERSBACH-MPS-IW')">EMEA-CH-HEMMERSBACH-MPS-IW</div>
+                        <div class="quick-copy-item color-blue" onclick="quickCopyText('CHA-PR-BECHTLE_IPG')">CHA-PR-BECHTLE_IPG</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="quick-copy-row">
+            <div class="quick-trigger-btn">OOW</div>
+            <div class="quick-copy-menu">
+                <div class="quick-menu-item">DE
+                    <div class="quick-sub-menu">
+                        <div class="quick-copy-item" onclick="quickCopyText('EMEA-DE-HEMMERSBACH-MPS-OOW')">EMEA-DE-HEMMERSBACH-MPS-OOW</div>
+                    </div>
+                </div>
+                <div class="quick-menu-item">AT
+                    <div class="quick-sub-menu">
+                        <div class="quick-copy-item" onclick="quickCopyText('EMEA-AT-HEMMERSBACH-TPM-OOW')">EMEA-AT-HEMMERSBACH-TPM-OOW</div>
+                        <div class="quick-copy-item color-yellow" onclick="quickCopyText('ATA-PR-TPM_OOWAT')">ATA-PR-TPM_OOWAT</div>
+                    </div>
+                </div>
+                <div class="quick-menu-item">CH
+                    <div class="quick-sub-menu">
+                        <div class="quick-copy-item" onclick="quickCopyText('EMEA-CH-HEMMERSBACH-MPS-OOW')">EMEA-CH-HEMMERSBACH-MPS-OOW</div>
+                        <div class="quick-copy-item color-blue" onclick="quickCopyText('CHA-PR-BECHTLE_IPG')">CHA-PR-BECHTLE_IPG</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -259,13 +457,34 @@
             defaults: ["VAS", "DE", "Mail", "NBD", "BF-TPM", "DMPS", "Pure"], 
             lists: [],
             formatter: (vals) => {
-                let base = vals.slice(0, 6).join(',') + ',';
-                let slot7 = vals[6], opt1 = document.getElementById('opt1').value.trim(), opt2 = document.getElementById('opt2').value.trim();
-                let res = base + ' //';
-                if (slot7 !== 'Pure') res += ' ' + slot7;
-                if (opt1) res += (slot7 === 'Pure') ? ' ' + opt1 : ' // ' + opt1;
-                if (opt2) res += ' // ' + opt2;
-                return res;
+                let segments = [];
+                
+                // Base structure (Slots 1-6 comma separated)
+                segments.push(vals.slice(0, 6).join(',') + ',');
+                segments.push('//');
+                
+                let slot7 = vals[6];
+                let opt1 = document.getElementById('opt1').value.trim();
+                let opt2 = document.getElementById('opt2').value.trim();
+                
+                // If Slot 7 is not Pure, it comes directly after the double slashes
+                if (slot7 !== 'Pure') {
+                    segments.push(slot7);
+                }
+                
+                // Process input fields
+                if (opt1) {
+                    if (slot7 !== 'Pure') segments.push('//');
+                    segments.push(opt1);
+                }
+                
+                if (opt2) {
+                    segments.push('//');
+                    segments.push(opt2);
+                }
+                
+                // Join segments by standard individual spaces and ensure it finishes with a single trailing space
+                return segments.join(' ') + ' ';
             }
         },
         elevation: {
@@ -643,6 +862,19 @@
         const st = document.getElementById(statusId);
         st.textContent = "TEMPLATE TEXT COPIED";
         setTimeout(() => st.textContent = "", 2000);
+    }
+
+    function quickCopyText(text) {
+        navigator.clipboard.writeText(text);
+        const st = document.getElementById('case-status');
+        if (st) {
+            st.textContent = "COPIED QUICK OPTION";
+            st.style.color = 'var(--template-green)';
+            setTimeout(() => {
+                st.textContent = "";
+                st.style.color = 'var(--accent)';
+            }, 2000);
+        }
     }
 
     window.onload = () => {
