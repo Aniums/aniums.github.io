@@ -75,9 +75,9 @@
 
         .page-content { margin-top: var(--nav-height); width: 100%; max-width: 1300px; display: none; flex-grow: 1; }
         .page-content.active { display: block; }
-        .generator-container { background: var(--box-bg); padding: 40px; border-radius: 0 0 16px 16px; border: 1px solid var(--page-border); border-top: none; }
+        .generator-container { background: var(--box-bg); padding: 20px 40px 40px 40px; border-radius: 0 0 16px 16px; border: 1px solid var(--page-border); border-top: none; }
 
-        .picker-wrapper { display: flex; position: relative; height: calc(var(--item-height) * 3); background: var(--machine-bg); border-radius: var(--slot-radius); overflow: hidden; margin-bottom: 30px; border: 3px solid #333; transition: border-radius 0.3s; }
+        .picker-wrapper { display: flex; position: relative; height: calc(var(--item-height) * 3); background: var(--machine-bg); border-radius: var(--slot-radius); overflow: hidden; margin-top: -10px; margin-bottom: 30px; border: 3px solid #333; transition: border-radius 0.3s; }
         .picker-wrapper::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: var(--item-height); background: var(--lens-bg); transform: translateY(-50%); pointer-events: none; z-index: 10; border-radius: var(--slot-radius); transition: border-radius 0.3s; }
         
         .sync-flash { animation: flash-green 0.6s ease-out; }
@@ -453,28 +453,31 @@
     const machines = {
         case: {
             containerId: 'caseContainer', statusId: 'case-status', 
-            data: [['VAS'], ['AT', 'DE', 'CH'], ['Tel', 'Mail', 'Queue'], ['12H CTR', '16H CTF', '2BD', '2BD CTR', '2BD FIX', '2H', '4H', '4H CTF', '4H CTR', '4H OnSite', '6H CTR', '8H CTR', '8H FIX', 'NBD', 'NBD FIX', 'NBD Exchange', 'NBD CTR', 'NDA', 'SBD', 'SBD FIX'], ['Supply', 'SW', 'BF-TPM', 'PM', 'PM-CSR', 'PM-HYD', 'PM-BF', 'BF'], ['PMPS', 'DMPS', 'SMPS'], ['Pure', 'Trust Case_CBA', 'Trust Case_Contract Extension', 'Trust Case_Onboarding']],
-            defaults: ["VAS", "DE", "Mail", "NBD", "BF-TPM", "DMPS", "Pure"], 
+            data: [['', 'PREDIAGVAS'], ['VAS'], ['AT', 'DE', 'CH'], ['Tel', 'Mail', 'Queue'], ['12H CTR', '16H CTF', '2BD', '2BD CTR', '2BD FIX', '2H', '4H', '4H CTF', '4H CTR', '4H OnSite', '6H CTR', '8H CTR', '8H FIX', 'NBD', 'NBD FIX', 'NBD Exchange', 'NBD CTR', 'NDA', 'SBD', 'SBD FIX'], ['Supply', 'SW', 'BF-TPM', 'PM', 'PM-CSR', 'PM-HYD', 'PM-BF', 'BF'], ['PMPS', 'DMPS', 'SMPS'], ['Pure', 'Trust Case_CBA', 'Trust Case_Contract Extension', 'Trust Case_Onboarding']],
+            defaults: ["", "VAS", "DE", "Mail", "NBD", "BF-TPM", "DMPS", "Pure"], 
             lists: [],
             formatter: (vals) => {
                 let segments = [];
                 
-                // Base structure (Slots 1-6 comma separated)
-                segments.push(vals.slice(0, 6).join(',') + ',');
+                // First slot prefix logic
+                let prefix = vals[0] === 'PREDIAGVAS' ? 'PREDIAGVAS//' : '';
+
+                // Base structure (Slots 2-7 comma separated)
+                segments.push(prefix + vals.slice(1, 7).join(',') + ',');
                 segments.push('//');
                 
-                let slot7 = vals[6];
+                let slot8 = vals[7];
                 let opt1 = document.getElementById('opt1').value.trim();
                 let opt2 = document.getElementById('opt2').value.trim();
                 
-                // If Slot 7 is not Pure, it comes directly after the double slashes
-                if (slot7 !== 'Pure') {
-                    segments.push(slot7);
+                // If Slot 8 is not Pure, it comes directly after the double slashes
+                if (slot8 !== 'Pure') {
+                    segments.push(slot8);
                 }
                 
                 // Process input fields
                 if (opt1) {
-                    if (slot7 !== 'Pure') segments.push('//');
+                    if (slot8 !== 'Pure') segments.push('//');
                     segments.push(opt1);
                 }
                 
@@ -807,7 +810,7 @@
             m.lists.push(list);
             data.forEach((text, rowIdx) => {
                 const item = document.createElement('div'); item.className = 'item ' + getKidsClass(col, rowIdx, key);
-                item.textContent = (key === 'case' && col === 6) ? (text === 'Pure' ? '//' : '// ' + text) : text;
+                item.textContent = (key === 'case' && col === 7) ? (text === 'Pure' ? '//' : '// ' + text) : text;
                 list.appendChild(item);
             });
             tumbler.appendChild(list); container.appendChild(tumbler);
